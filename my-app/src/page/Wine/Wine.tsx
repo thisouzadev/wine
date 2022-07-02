@@ -10,9 +10,10 @@ interface IWineListProps {
 }
 const Wine: React.FC = () => {
   const [wineData, setWineData] = useState<IWineListProps[]>([]);
-  const [wineList, setWineList] = useState<any>([]);
+  const [wineList, setWineList] = useState<IWineListProps[]>([]);
   const [data, setData] = useState<any>([]);
   const [page, setPage] = useState<number>(1);
+
   async function getWineAPIData() {
     const url = `https://wine-back-test.herokuapp.com/products?page=${page}&limit=10`;
     const response = await fetch(url).then((resp) => resp.json());
@@ -23,7 +24,7 @@ const Wine: React.FC = () => {
 
   useEffect(() => {
     getWineAPIData();
-  }, [wineData, data]);
+  }, [page]);
 
   const increment = () => {
     if (page !== data.totalPages) {
@@ -46,11 +47,24 @@ const Wine: React.FC = () => {
     const {value} = event.target;
     setPage(+value);
   };
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const {value} = event.target;
+    setWineData(wineList.filter((wine) => {
+      return wine.name.toLowerCase().includes(value.toLowerCase());
+    }));
+  };
+
   if (!wineData) {
     return <div>Loading...</div>;
   }
   return (
     <>
+      <div>
+        <input
+          onChange={ (event) => handleChange(event) }
+          type="text"
+          name="searchTask" />
+      </div>
       <div>
         {wineData.map((wine) => (
           <section key={wine.id}>
